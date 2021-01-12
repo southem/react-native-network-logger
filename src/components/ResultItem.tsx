@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import type NetworkRequestInfo from '../NetworkRequestInfo';
+import NetworkRequestInfo from '../NetworkRequestInfo';
 import { Theme, useThemedStyles, useTheme } from '../theme';
+import { backHandlerSet } from '../backHandler';
 
 interface Props {
   request: NetworkRequestInfo;
@@ -12,6 +13,7 @@ interface Props {
 const ResultItem: React.FC<Props> = ({ style, request, onPress }) => {
   const styles = useThemedStyles(themedStyles);
   const theme = useTheme();
+  const onDetailsPage = !onPress;
   const getUrlTextColor = (status: number) => {
     if (status >= 400) {
       return {
@@ -21,6 +23,9 @@ const ResultItem: React.FC<Props> = ({ style, request, onPress }) => {
     return {};
   };
   const getStatusTextColor = (status: number) => {
+    if (status < 0) {
+      return theme.colors.text;
+    }
     if (status < 400) {
       return theme.colors.statusGood;
     }
@@ -74,7 +79,12 @@ const ResultItem: React.FC<Props> = ({ style, request, onPress }) => {
         <Text style={styles.time}>{getTime(request.startTime)}</Text>
       </View>
       <Text
-        style={[styles.text, styles.content, getUrlTextColor(request.status)]}
+        style={[
+          styles.text,
+          styles.content,
+          getUrlTextColor(request.status),
+          onDetailsPage && !backHandlerSet() && styles.paddedUrl,
+        ]}
       >
         {request.url}
       </Text>
@@ -128,6 +138,9 @@ const themedStyles = (theme: Theme) =>
       color: theme.colors.muted,
       marginTop: 5,
       marginHorizontal: 2,
+    },
+    paddedUrl: {
+      paddingVertical: 20,
     },
   });
 

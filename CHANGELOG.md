@@ -1,3 +1,64 @@
+## [1.8.1](https://github.com/alexbrazier/react-native-network-logger/compare/v1.8.0...v1.8.1) (2020-11-04)
+
+
+### Bug Fixes
+
+* dont try and update unmounted component ([#38](https://github.com/alexbrazier/react-native-network-logger/issues/38)) ([59af7e9](https://github.com/alexbrazier/react-native-network-logger/commit/59af7e95af79463efe7d7540b76e4110b1af5dca))
+
+# [1.8.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.7.0...v1.8.0) (2020-10-06)
+
+
+### Bug Fixes
+
+* Request not showing up until response received ([#33](https://github.com/alexbrazier/react-native-network-logger/issues/33)) ([4b3ab62](https://github.com/alexbrazier/react-native-network-logger/commit/4b3ab62d3279d4917f1c0a159f6d1cb03ea70812))
+
+
+### Features
+
+* Changed inflight status color to text color ([#30](https://github.com/alexbrazier/react-native-network-logger/issues/30)) ([563ac95](https://github.com/alexbrazier/react-native-network-logger/commit/563ac95ba685ecd784379f3cb8656625ea3abd48))
+
+# [1.7.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.6.0...v1.7.0) (2020-09-22)
+
+
+### Features
+
+* Add search box to filter Requests by URL ([#28](https://github.com/alexbrazier/react-native-network-logger/issues/28)) ([e1cbe9a](https://github.com/alexbrazier/react-native-network-logger/commit/e1cbe9adef14b5297cb5b54584b98c8f9173e64c))
+* Grouped the Request and Response Sections ([#25](https://github.com/alexbrazier/react-native-network-logger/issues/25)) ([b3ca2e3](https://github.com/alexbrazier/react-native-network-logger/commit/b3ca2e30cbbc4102b7be1b03d164c8a019226658))
+
+# [1.6.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.5.0...v1.6.0) (2020-09-13)
+
+
+### Bug Fixes
+
+* Remember scroll position when navigating back to requests ([#22](https://github.com/alexbrazier/react-native-network-logger/issues/22)) ([91e6768](https://github.com/alexbrazier/react-native-network-logger/commit/91e67682c25b562339d28316876b34cf953902a1))
+* Request details close button overlap ([#23](https://github.com/alexbrazier/react-native-network-logger/issues/23)) ([7c21317](https://github.com/alexbrazier/react-native-network-logger/commit/7c21317a2073160bdff17fd930ac4ecc27b4c3de))
+
+
+### Features
+
+* Add option to use existing back button to navigate ([#24](https://github.com/alexbrazier/react-native-network-logger/issues/24)) ([054167f](https://github.com/alexbrazier/react-native-network-logger/commit/054167f67303c1b3cdb18710d477211811c4e760))
+
+# [1.5.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.4.1...v1.5.0) (2020-07-27)
+
+
+### Bug Fixes
+
+* Issue when sending request with FormData ([1c2ea1c](https://github.com/alexbrazier/react-native-network-logger/commit/1c2ea1ce7aa30f2836c10747033dab6a63215b10))
+* Issue when sharing request that isn't json ([202c31d](https://github.com/alexbrazier/react-native-network-logger/commit/202c31dae94f05b0f56f7e74be3c7e0e30f3933a))
+
+
+### Features
+
+* Add option to change sort order and set default to desc ([#14](https://github.com/alexbrazier/react-native-network-logger/issues/14)) ([3aedb0c](https://github.com/alexbrazier/react-native-network-logger/commit/3aedb0c1effc3d3bd7b5f9c95aac28050f482d5b))
+
+## [1.4.1](https://github.com/alexbrazier/react-native-network-logger/compare/v1.4.0...v1.4.1) (2020-07-16)
+
+
+### Bug Fixes
+
+* Issue with event listeners ([430eefd](https://github.com/alexbrazier/react-native-network-logger/commit/430eefd79477966edb22c1e395b122aac0f4d8fa))
+* Remove type imports/exports to fix for older TS versions ([#17](https://github.com/alexbrazier/react-native-network-logger/issues/17)) ([f4cbefa](https://github.com/alexbrazier/react-native-network-logger/commit/f4cbefa7afe0988818134482b6d0ea46ae77efcd))
+
 # [1.4.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.3.2...v1.4.0) (2020-06-28)
 
 

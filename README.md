@@ -1,6 +1,6 @@
 # react-native-network-logger [![GitHub stars](https://img.shields.io/github/stars/alexbrazier/react-native-network-logger?label=Star%20Project&style=social)](https://github.com/alexbrazier/react-native-network-logger/stargazers)
 
-[![CircleCI](https://img.shields.io/circleci/build/gh/alexbrazier/react-native-network-logger)](https://circleci.com/gh/alexbrazier/react-native-network-logger)
+[![CI](https://github.com/alexbrazier/react-native-network-logger/workflows/CI/badge.svg)](https://github.com/alexbrazier/react-native-network-logger/actions)
 [![Dependencies](https://img.shields.io/david/alexbrazier/react-native-network-logger)](https://david-dm.org/alexbrazier/react-native-network-logger)
 [![npm](https://img.shields.io/npm/v/react-native-network-logger)](https://www.npmjs.com/package/react-native-network-logger)
 [![npm bundle size](https://img.shields.io/bundlephobia/min/react-native-network-logger)](https://bundlephobia.com/result?p=react-native-network-logger)
@@ -16,7 +16,7 @@ An alternative to Wormholy but for both iOS and Android and with zero native dep
 - Log networks requests on iOS and Android
 - View network requests made with in app viewer
 - Debug network requests on release builds
-- Individually view headers sent, received and body sent and received
+- Individually view request/response headers and body
 - Copy or share headers, body or full request
 - Share cURL representation of request
 - Zero native or JavaScript dependencies
@@ -64,7 +64,7 @@ npm install --save react-native-network-logger
 
 Call `startNetworkLogging` in your apps entry point to log every request, or call it on a button press to manually trigger it.
 
-```js
+```ts
 import { startNetworkLogging } from 'react-native-network-logger';
 
 startNetworkLogging();
@@ -73,7 +73,7 @@ AppRegistry.registerComponent('App', () => App);
 
 ### Display Requests and Responses
 
-```js
+```ts
 import NetworkLogger from 'react-native-network-logger';
 
 const MyScreen = () => <NetworkLogger />;
@@ -83,7 +83,7 @@ const MyScreen = () => <NetworkLogger />;
 
 You can change between the dark and light theme by passing the `theme` prop with `"dark"` or `"light"`.
 
-```js
+```ts
 import NetworkLogger from 'react-native-network-logger';
 
 const MyScreen = () => <NetworkLogger theme="dark" />;
@@ -91,10 +91,39 @@ const MyScreen = () => <NetworkLogger theme="dark" />;
 
 ### Logging options
 
+#### Max Requests
+
 You can configure the max number of requests stored on the device using by calling `startNetworkLogging` with the `maxRequests` option. The default is `500`.
 
-```js
+```ts
 startNetworkLogging({ maxRequests: 500 });
+```
+
+#### Sorting
+
+Set the sort order of requests. Options are `asc` or `desc`, default is `desc` (most recent at the top).
+
+```tsx
+import NetworkLogger from 'react-native-network-logger';
+
+const MyScreen = () => <NetworkLogger sort="asc" />;
+```
+
+#### Integrate with existing navigation
+
+Use your existing back button (e.g. in your navigation header) to navigate within the network logger.
+
+```tsx
+import NetworkLogger, { getBackHandler } from 'react-native-network-logger';
+
+const navigation = useNavigation();
+const onBack = getBackHandler(navigation.goBack);
+
+const MyScreen = () => (
+  <Screen onBackPressed={onBack}>
+    <NetworkLogger />
+  </Screen>
+);
 ```
 
 ## Example App

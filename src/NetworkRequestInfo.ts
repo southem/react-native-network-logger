@@ -1,7 +1,9 @@
 import BlobFileReader from 'react-native/Libraries/Blob/FileReader';
-import type { Headers, RequestMethod } from './types';
+import { Headers, RequestMethod } from './types';
+import fromEntries from './utils/fromEntries';
 
 export default class NetworkRequestInfo {
+  id = '';
   type = '';
   url = '';
   method: RequestMethod;
@@ -9,8 +11,8 @@ export default class NetworkRequestInfo {
   dataSent = '';
   responseContentType = '';
   responseSize = 0;
-  requestHeaders?: Headers;
-  responseHeaders?: Headers;
+  requestHeaders: Headers = {};
+  responseHeaders: Headers = {};
   response = '';
   responseURL = '';
   responseType = '';
@@ -22,7 +24,8 @@ export default class NetworkRequestInfo {
   startTime: number = 0;
   endTime: number = 0;
 
-  constructor(type: string, method: RequestMethod, url: string) {
+  constructor(id: string, type: string, method: RequestMethod, url: string) {
+    this.id = id;
     this.type = type;
     this.method = method;
     this.url = url;
@@ -52,14 +55,17 @@ export default class NetworkRequestInfo {
   }
 
   private escapeQuotes(value: string) {
-    return value.replace(/'/g, `\\'`);
+    return value.replace?.(/'/g, `\\'`);
   }
 
-  private stringifyFormat(data: string) {
+  private stringifyFormat(data: any) {
     try {
-      return JSON.stringify(JSON.parse(data), null, '\t');
+      if (data?._parts?.length) {
+        return JSON.stringify(fromEntries(data?._parts), null, 2);
+      }
+      return JSON.stringify(JSON.parse(data), null, 2);
     } catch (e) {
-      return data;
+      return `${data}`;
     }
   }
 
@@ -67,7 +73,7 @@ export default class NetworkRequestInfo {
     return this.stringifyFormat(this.dataSent);
   }
 
-  private async parseReponseBlob() {
+  private async parseResponseBlob() {
     const blobReader = new BlobFileReader();
     blobReader.readAsText(this.response);
 
@@ -85,7 +91,7 @@ export default class NetworkRequestInfo {
   async getResponseBody() {
     const body = await (this.responseType !== 'blob'
       ? this.response
-      : this.parseReponseBlob());
+      : this.parseResponseBlob());
 
     return this.stringifyFormat(body);
   }

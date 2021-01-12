@@ -8,8 +8,9 @@ import {
   TextInput,
   Platform,
 } from 'react-native';
-import type NetworkRequestInfo from '../NetworkRequestInfo';
+import NetworkRequestInfo from '../NetworkRequestInfo';
 import { useThemedStyles, Theme } from '../theme';
+import { backHandlerSet } from '../backHandler';
 import ResultItem from './ResultItem';
 import Header from './Header';
 import Button from './Button';
@@ -89,9 +90,17 @@ const RequestDetails: React.FC<Props> = ({ request, onClose }) => {
   const requestBody = request.getRequestBody();
 
   const getFullRequest = () => {
+    let response;
+    if (responseBody) {
+      try {
+        response = JSON.parse(responseBody);
+      } catch {
+        response = `${responseBody}`;
+      }
+    }
     const processedRequest = {
       ...request,
-      response: responseBody ? JSON.parse(responseBody) : undefined,
+      response,
       duration: request.duration,
     };
     return JSON.stringify(processedRequest, null, 2);
@@ -102,9 +111,9 @@ const RequestDetails: React.FC<Props> = ({ request, onClose }) => {
       <ResultItem request={request} style={styles.info} />
       <ScrollView style={styles.scrollView} nestedScrollEnabled>
         <Headers title="Request Headers" headers={request.requestHeaders} />
-        <Headers title="Response Headers" headers={request.responseHeaders} />
         <Header shareContent={requestBody}>Request Body</Header>
         <LargeText>{requestBody}</LargeText>
+        <Headers title="Response Headers" headers={request.responseHeaders} />
         <Header shareContent={responseBody}>Response Body</Header>
         <LargeText>{responseBody}</LargeText>
         <Header>More</Header>
@@ -121,9 +130,11 @@ const RequestDetails: React.FC<Props> = ({ request, onClose }) => {
           Share as cURL
         </Button>
       </ScrollView>
-      <Button onPress={onClose} style={styles.close}>
-        Close
-      </Button>
+      {!backHandlerSet() && (
+        <Button onPress={onClose} style={styles.close}>
+          Close
+        </Button>
+      )}
     </View>
   );
 };

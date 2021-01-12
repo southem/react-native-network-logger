@@ -1,10 +1,6 @@
 import XHRInterceptor from 'react-native/Libraries/Network/XHRInterceptor';
 import NetworkRequestInfo from './NetworkRequestInfo';
-import type {
-  Headers,
-  RequestMethod,
-  StartNetworkLoggingOptions,
-} from './types';
+import { Headers, RequestMethod, StartNetworkLoggingOptions } from './types';
 let nextXHRId = 0;
 
 type XHR = {
@@ -20,17 +16,95 @@ export default class Logger {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   callback = (requests: any[]) => {};
 
-  setCallback(callback: any) {
+  setCallback = (callback: any) => {
     this.callback = callback;
-  }
+  };
 
-  private getRequest(xhrIndex?: number) {
+  private getRequest = (xhrIndex?: number) => {
     if (xhrIndex === undefined) return undefined;
-    const requestIndex = this.xhrIdMap[xhrIndex];
+    const requestIndex = this.requests.length - this.xhrIdMap[xhrIndex] - 1;
     return this.requests[requestIndex];
-  }
+  };
 
-  enableXHRInterception(options?: StartNetworkLoggingOptions) {
+  private updateRequest = (
+    index: number,
+    update: Partial<NetworkRequestInfo>
+  ) => {
+    const networkInfo = this.getRequest(index);
+    if (!networkInfo) return;
+    Object.assign(networkInfo, update);
+  };
+
+  private openCallback = (method: RequestMethod, url: string, xhr: XHR) => {
+    xhr._index = nextXHRId++;
+    const xhrIndex = this.requests.length;
+    this.xhrIdMap[xhr._index] = xhrIndex;
+
+    const newRequest = new NetworkRequestInfo(
+      `${nextXHRId}`,
+      'XMLHttpRequest',
+      method,
+      url
+    );
+
+    if (this.requests.length >= this.maxRequests) {
+      this.requests.pop();
+    }
+
+    this.requests.unshift(newRequest);
+  };
+
+  private requestHeadersCallback = (
+    header: string,
+    value: string,
+    xhr: XHR
+  ) => {
+    const networkInfo = this.getRequest(xhr._index);
+    if (!networkInfo) return;
+    networkInfo.requestHeaders[header] = value;
+  };
+
+  private headerReceivedCallback = (
+    responseContentType: string,
+    responseSize: number,
+    responseHeaders: Headers,
+    xhr: XHR
+  ) => {
+    this.updateRequest(xhr._index, {
+      responseContentType,
+      responseSize,
+      responseHeaders: xhr.responseHeaders,
+    });
+  };
+
+  private sendCallback = (data: string, xhr: XHR) => {
+    this.updateRequest(xhr._index, {
+      startTime: Date.now(),
+      dataSent: data,
+    });
+    this.callback(this.requests);
+  };
+
+  private responseCallback = (
+    status: number,
+    timeout: number,
+    response: string,
+    responseURL: string,
+    responseType: string,
+    xhr: XHR
+  ) => {
+    this.updateRequest(xhr._index, {
+      endTime: Date.now(),
+      status,
+      timeout,
+      response,
+      responseURL,
+      responseType,
+    });
+    this.callback(this.requests);
+  };
+
+  enableXHRInterception = (options?: StartNetworkLoggingOptions) => {
     if (XHRInterceptor.isInterceptorEnabled()) {
       return;
     }
@@ -45,83 +119,21 @@ export default class Logger {
       this.maxRequests = options.maxRequests;
     }
 
-    XHRInterceptor.setOpenCallback(
-      (method: RequestMethod, url: string, xhr: XHR) => {
-        xhr._index = nextXHRId++;
-        const xhrIndex = this.requests.length;
-        this.xhrIdMap[xhr._index] = xhrIndex;
+    XHRInterceptor.setOpenCallback(this.openCallback);
+    XHRInterceptor.setRequestHeaderCallback(this.requestHeadersCallback);
+    XHRInterceptor.setHeaderReceivedCallback(this.headerReceivedCallback);
+    XHRInterceptor.setSendCallback(this.sendCallback);
+    XHRInterceptor.setResponseCallback(this.responseCallback);
 
-        const newRequest = new NetworkRequestInfo(
-          'XMLHttpRequest',
-          method,
-          url
-        );
-
-        if (this.requests.length >= this.maxRequests) {
-          this.requests.shift();
-        }
-
-        this.requests.push(newRequest);
-      }
-    );
-
-    XHRInterceptor.setRequestHeaderCallback(
-      (header: string, value: string, xhr: XHR) => {
-        const networkInfo = this.getRequest(xhr._index);
-        if (!networkInfo) return;
-        if (!networkInfo.requestHeaders) {
-          networkInfo.requestHeaders = {};
-        }
-        networkInfo.requestHeaders[header] = value;
-      }
-    );
-
-    XHRInterceptor.setSendCallback((data: string, xhr: XHR) => {
-      const request = this.getRequest(xhr._index);
-      if (!request) return;
-      request.startTime = Date.now();
-      request.dataSent = data;
-    });
-
-    XHRInterceptor.setHeaderReceivedCallback(
-      (type: string, size: number, responseHeaders: Headers, xhr: XHR) => {
-        const networkInfo = this.getRequest(xhr._index);
-        if (!networkInfo) return;
-        networkInfo.responseContentType = type;
-        networkInfo.responseSize = size;
-        networkInfo.responseHeaders = xhr.responseHeaders;
-      }
-    );
-
-    XHRInterceptor.setResponseCallback(
-      (
-        status: number,
-        timeout: number,
-        response: string,
-        responseURL: string,
-        responseType: string,
-        xhr: XHR
-      ) => {
-        const networkInfo = this.getRequest(xhr._index);
-        if (!networkInfo) return;
-        networkInfo.endTime = Date.now();
-        networkInfo.status = status;
-        networkInfo.timeout = timeout;
-        networkInfo.response = response;
-        networkInfo.responseURL = responseURL;
-        networkInfo.responseType = responseType;
-        this.callback(this.requests);
-      }
-    );
     XHRInterceptor.enableInterception();
-  }
+  };
 
-  getRequests() {
+  getRequests = () => {
     return this.requests;
-  }
+  };
 
-  clearRequests() {
+  clearRequests = () => {
     this.requests = [];
     this.callback(this.requests);
-  }
+  };
 }
